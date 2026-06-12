@@ -1,0 +1,13 @@
+{
+  "name": "secure-browser",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": { "label": "Browser", "onAutoForward": "openPreview" }
+  },
+  "postStartCommand": "docker compose -f .devcontainer/docker-compose.yml up -d",
+  "postAttachCommand": "echo '>> When port 3000 forwards, open it to use a real Chromium. Log into ChatGPT/Google there.'"
+}

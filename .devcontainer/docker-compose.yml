@@ -1,0 +1,17 @@
+services:
+  chromium:
+    image: lscr.io/linuxserver/chromium:latest
+    container_name: chromium
+    security_opt:
+      - seccomp:unconfined        # required by Chromium's sandbox in a container
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - CHROME_CLI=https://chatgpt.com/   # page Chromium opens on
+    volumes:
+      - ./config:/config          # persists your logins/profile across restarts
+    ports:
+      - "3000:3000"               # web UI (KasmVNC) — Codespaces forwards this
+    shm_size: "1gb"
+    restart: unless-stopped
