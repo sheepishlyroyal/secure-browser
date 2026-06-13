@@ -2,12 +2,12 @@
   "name": "secure-browser",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
   },
   "forwardPorts": [3000],
   "portsAttributes": {
     "3000": { "label": "Browser", "onAutoForward": "openPreview" }
   },
-  "postStartCommand": "docker compose -f .devcontainer/docker-compose.yml up -d",
-  "postAttachCommand": "echo '>> When port 3000 forwards, open it to use a real Chromium. Log into ChatGPT/Google there.'"
+  "postStartCommand": "docker compose -f .devcontainer/docker-compose.yml up -d && (for i in $(seq 1 40); do gh codespace ports visibility 3000:public -c \"$CODESPACE_NAME\" && echo 'port 3000 is public' && break || sleep 3; done) || echo 'could not auto-set public; set it manually in the Ports tab once'"
 }
