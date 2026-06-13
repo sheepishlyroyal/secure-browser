@@ -9,5 +9,5 @@
   "portsAttributes": {
     "3000": { "label": "Browser", "onAutoForward": "openPreview" }
   },
-  "postStartCommand": "docker compose -f .devcontainer/docker-compose.yml up -d && (for i in $(seq 1 40); do gh codespace ports visibility 3000:public -c \"$CODESPACE_NAME\" && echo 'port 3000 is public' && break || sleep 3; done) || echo 'could not auto-set public; set it manually in the Ports tab once'"
+  "postStartCommand": "nohup bash -c 'docker compose -f .devcontainer/docker-compose.yml up -d; for i in $(seq 1 240); do gh codespace ports visibility 3000:public -c \"$CODESPACE_NAME\" >/dev/null 2>&1 && { echo public; break; }; sleep 5; done' >/tmp/poststart.log 2>&1 &"
 }
