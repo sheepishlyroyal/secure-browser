@@ -14,3 +14,18 @@ services:
       - "3000:3000"               # web UI (KasmVNC) — Codespaces forwards this
     shm_size: "1gb"
     restart: unless-stopped
+
+  # Watchdog: if you close Chromium's last window the desktop would otherwise sit blank.
+  # This respawns it within seconds (container restart; your ./config profile is kept), so
+  # the "Reopen" button just needs to reload the page. Additive — if it ever fails, Chromium
+  # still runs exactly as before.
+  watchdog:
+    image: docker:cli
+    container_name: chromium-watchdog
+    restart: unless-stopped
+    depends_on:
+      - chromium
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./watchdog.sh:/watchdog.sh:ro
+    command: ["sh", "/watchdog.sh"]
