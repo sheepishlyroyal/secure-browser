@@ -7,8 +7,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Europe/London
-      - CHROME_CLI=https://chatgpt.com/   # page Chromium opens on
+      - TZ=Europe/London          # opens to a blank new tab — add your own sites
     volumes:
       - ./config:/config          # persists your logins/profile across restarts
     ports:
