@@ -1,9 +1,8 @@
 services:
   # Full Debian (XFCE) desktop streamed over KasmVNC on port 3000 — a real computer, not
   # just a browser: desktop, file manager, terminal, and `sudo apt` to install more apps.
-  # Chromium is pre-installed via the linuxserver package mod. Debian (vs Ubuntu) ships a
-  # real chromium apt package that works in a container, and the image is smaller so first
-  # boot is quicker. Your home, installed apps and logins persist in ./config.
+  # Chromium is pre-installed (package mod) and auto-opens on login (init-autostart.sh).
+  # Your home, installed apps and logins persist in ./config.
   desktop:
     image: lscr.io/linuxserver/webtop:debian-xfce
     container_name: desktop
@@ -15,9 +14,10 @@ services:
       - TZ=Europe/London
       - TITLE=Desktop
       - DOCKER_MODS=linuxserver/mods:universal-package-install
-      - INSTALL_PACKAGES=chromium  # pre-install Chromium on the desktop
+      - INSTALL_PACKAGES=chromium
     volumes:
       - ./config:/config
+      - ./init-autostart.sh:/custom-cont-init.d/99-autostart-chromium:ro
     ports:
       - "3000:3000"
     shm_size: "2gb"
