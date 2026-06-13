@@ -2,12 +2,12 @@ services:
   # Full Debian (XFCE) desktop streamed over KasmVNC on port 3000 — a real computer, not
   # just a browser: desktop, file manager, terminal, and `sudo apt` to install more apps.
   # Chromium is pre-installed (package mod) and auto-opens on login (init-autostart.sh).
-  # Your home, installed apps and logins persist in ./config.
+  # privileged: lets Flatpak/bubblewrap create namespaces + mount proc, so Flatpak apps
+  # (Sober, etc.) can install/run inside the container. Your home + apps persist in ./config.
   desktop:
     image: lscr.io/linuxserver/webtop:debian-xfce
     container_name: desktop
-    security_opt:
-      - seccomp:unconfined        # needed for Chromium's sandbox in a container
+    privileged: true
     environment:
       - PUID=1000
       - PGID=1000
@@ -18,6 +18,8 @@ services:
     volumes:
       - ./config:/config
       - ./init-autostart.sh:/custom-cont-init.d/99-autostart-chromium:ro
+    devices:
+      - /dev/fuse
     ports:
       - "3000:3000"
     shm_size: "2gb"
