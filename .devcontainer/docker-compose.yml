@@ -1,20 +1,24 @@
 services:
-  # A full Ubuntu (XFCE) desktop streamed over KasmVNC on port 3000 — not just a browser.
-  # You get a desktop, a file manager, a terminal, and you can install apps (sudo apt /
-  # download .debs). Your files + installed apps persist in ./config across restarts.
+  # Full Debian (XFCE) desktop streamed over KasmVNC on port 3000 — a real computer, not
+  # just a browser: desktop, file manager, terminal, and `sudo apt` to install more apps.
+  # Chromium is pre-installed via the linuxserver package mod. Debian (vs Ubuntu) ships a
+  # real chromium apt package that works in a container, and the image is smaller so first
+  # boot is quicker. Your home, installed apps and logins persist in ./config.
   desktop:
-    image: lscr.io/linuxserver/webtop:ubuntu-xfce
+    image: lscr.io/linuxserver/webtop:debian-xfce
     container_name: desktop
     security_opt:
-      - seccomp:unconfined        # needed for sandboxed apps (Chromium/Electron) in a container
+      - seccomp:unconfined        # needed for Chromium's sandbox in a container
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/London
       - TITLE=Desktop
+      - DOCKER_MODS=linuxserver/mods:universal-package-install
+      - INSTALL_PACKAGES=chromium  # pre-install Chromium on the desktop
     volumes:
-      - ./config:/config          # persists your home, installed apps and logins
+      - ./config:/config
     ports:
-      - "3000:3000"               # web UI (KasmVNC) — Codespaces forwards this
-    shm_size: "2gb"               # headroom for browsers / Electron apps
+      - "3000:3000"
+    shm_size: "2gb"
     restart: unless-stopped
