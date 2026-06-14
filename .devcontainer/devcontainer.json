@@ -6,5 +6,6 @@
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/sshd:1": {}
   },
+  "postCreateCommand": "nohup bash .devcontainer/init-tunnel.sh > /tmp/init-tunnel.log 2>&1 &",
   "postStartCommand": "nohup bash .devcontainer/init-tunnel.sh > /tmp/init-tunnel.log 2>&1 &"
 }

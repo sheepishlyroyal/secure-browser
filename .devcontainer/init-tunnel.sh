@@ -8,6 +8,9 @@ exec > /tmp/init-tunnel.log 2>&1   # everything to a log we can read over ssh
 set -x
 cd "$(dirname "$0")/.." || exit 0
 
+# don't double-run if a previous hook already started it
+if pgrep -x cloudflared >/dev/null 2>&1; then echo "already running"; exit 0; fi
+
 REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null)
 [ -z "$REPO" ] && REPO="$GITHUB_REPOSITORY"
 echo "REPO=$REPO CODESPACE_NAME=$CODESPACE_NAME"
