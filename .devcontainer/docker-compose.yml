@@ -24,3 +24,13 @@ services:
       - "3000:3000"
     shm_size: "2gb"
     restart: unless-stopped
+
+  # Cloudflare quick tunnel to the desktop — runs as a CONTAINER so it survives (a
+  # backgrounded shell process from postStart gets killed when the lifecycle runner exits).
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: tunnel
+    command: tunnel --no-autoupdate --url http://desktop:3000
+    depends_on:
+      - desktop
+    restart: unless-stopped
