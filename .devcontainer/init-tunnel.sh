@@ -13,11 +13,18 @@ REPO=$(git remote get-url origin 2>/dev/null | sed -E 's#.*github\.com[:/]+([^/]
 [ -z "$REPO" ] && REPO="$GITHUB_REPOSITORY"
 echo "REPO=$REPO CS=$CODESPACE_NAME token=$([ -n "$GITHUB_TOKEN" ] && echo set || echo MISSING)"
 
+# bring the desktop up (cached image on a restart → fast; first boot pulls it)
 docker compose -f .devcontainer/docker-compose.yml up -d
+# The quick-tunnel hostname is RANDOM and changes on every boot, so on a restart the URL we
+# published last time is dead (cloudflared 530). Force a clean tunnel container so its logs
+# contain ONLY the current URL — and recreate just the tunnel (--no-deps) so the desktop
+# keeps running and its image stays warm.
+docker compose -f .devcontainer/docker-compose.yml up -d --force-recreate --no-deps tunnel
 
 URL=""
-for i in $(seq 1 80); do
-  URL=$(docker compose -f .devcontainer/docker-compose.yml logs tunnel 2>/dev/null | grep -ohE 'https://[a-z0-9-]+\.trycloudflare\.com' | head -1)
+for i in $(seq 1 100); do
+  # tail -1 = the most recent URL the (freshly recreated) tunnel printed, never a stale one
+  URL=$(docker compose -f .devcontainer/docker-compose.yml logs --no-log-prefix tunnel 2>/dev/null | grep -ohE 'https://[a-z0-9-]+\.trycloudflare\.com' | tail -1)
   [ -n "$URL" ] && break
   sleep 3
 done
